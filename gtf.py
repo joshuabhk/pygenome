@@ -3,7 +3,7 @@
 """
 Created on Thu Aug 10 16:06:21 2017
 
-@author: kimb8
+@author: Bong-Hyun Kim
 
 My own stripped down GTF file reader.
 Focused on easy and flexible parsing on GENCODE GTF file.

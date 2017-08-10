@@ -1,5 +1,9 @@
 # -*- coding: utf-8 -*-
 """
+Created on Thu Aug 10 16:06:21 2017
+
+@author: Bong-Hyun Kim
+
 Read bedgraph file and produce various summaries.
 """
 

@@ -3,7 +3,7 @@
 """
 Created on Thu Aug 10 16:09:59 2017
 
-@author: kimb8
+@author: Bong-Hyun Kim
 
 Reimplementation of BROAD Gene Set Enrichment Analysis
 in python with ES (Enrichment Score) 
