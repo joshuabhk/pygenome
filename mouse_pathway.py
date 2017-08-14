@@ -1,6 +1,6 @@
 import sys
 from collections import Counter
-from statsmodels.sandbox.stats.multicomp import multipletests
+from statsmodels.stats.multitests import multipletests
 from scipy.stats import fisher_exact #, chi2_contingency
 
 id2sym = {}
