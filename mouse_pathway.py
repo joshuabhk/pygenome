@@ -1,6 +1,6 @@
 import sys
 from collections import Counter
-from statsmodels.stats.multitests import multipletests
+from statsmodels.stats.multitest import multipletests
 from scipy.stats import fisher_exact #, chi2_contingency
 from os.path import dirname, join
 
