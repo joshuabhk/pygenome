@@ -17,30 +17,30 @@ def pathway2fisherp( nlist, npathway, nlistnpathway, ntotal, verbose=False ):
         print( "# of genes in the pathway:", npathway )
         print( "# of genes in the both:", nlistnpathway )
         print( "# of genes total:", ntotal )
-        
+
     a = nlistnpathway
     b = npathway - a
     c = nlist - a
     d = ntotal - a - b - c
-    if verbose: 
+    if verbose:
         print([a,b],[c,d], sep="\n")
     return fisher_exact([[a,b],[c,d]])[1]
 
 
 def build_gene2path( pathfn, gid_map={}, minsize_cutoff=1 ) :
     g2p = {}
-    
+
     for l in open(pathfn):
         line = l.split('\t')
         pid = line[0]
         genes = set(line[9].split())
         if len(genes) < minsize_cutoff :
             continue
-            
+
         for g in genes :
             if gid_map :
                 g = gid_map[g]
-                
+
             if g in g2p :
                 g2p[g].add(pid)
             else :
@@ -51,16 +51,16 @@ def build_gene2path( pathfn, gid_map={}, minsize_cutoff=1 ) :
 def build_pathways( pathfn, minsize_cutoff=1 ):
     pid2pathway = {}
     pid2genecounts = {}
-    
+
     for l in open( pathfn ):
         line = l.split('\t')
         pid = line[0]
         if int(line[8]) < minsize_cutoff :
             continue
-            
+
         pid2pathway[pid] = l
         pid2genecounts[pid] = len(line[9].split())
-        
+
     return pid2pathway, pid2genecounts
 
 
@@ -74,14 +74,14 @@ def print_output( fn, gnames, pvalues, adj_pvalues, pathway_ids, pathways, cutof
         both = gnames.intersection(pnames)
 
 
-        print(i, p, adj_p, 
-              len(both)/len(pnames)-nlist/total, 
-              len(both), 
-              len(pnames), 
-              nlist, 
-              total, 
-              line[1], 
-              line[2], 
+        print(i, p, adj_p,
+              len(both)/len(pnames)-nlist/total,
+              len(both),
+              len(pnames),
+              nlist,
+              total,
+              line[1],
+              line[2],
               line[3],
               line[7],
               " ".join(both),
@@ -90,13 +90,14 @@ def print_output( fn, gnames, pvalues, adj_pvalues, pathway_ids, pathways, cutof
             break
     ofp.close()
 
-    
-                 
+
+
 if __name__ == '__main__' :
-    mouse_pathway_fn = 'warpath.mouse.txt'
+    from os.path import dirname, join
+    mouse_pathway_fn = join( dirname(sys.argv[0]), 'warpath.mouse.txt' )
     input_list = sys.argv[1]
     output_fn = sys.argv[2]
-    
+
     g2p = build_gene2path( mouse_pathway_fn )
     pathways, genecounts = build_pathways(mouse_pathway_fn)
     genes = set([id2sym[g] for g in [ l.split(".")[0] for l in open(input_list) ] if g in id2sym ])
@@ -106,11 +107,11 @@ if __name__ == '__main__' :
     for gs in pathways_in :
         for g in gs :
             c[g]+=1
-    
+
     nlist = len(pathways_in)
     total = len(g2p)
 
-    results = [ (pathway2fisherp(nlist, genecounts[pid], 
+    results = [ (pathway2fisherp(nlist, genecounts[pid],
                                  both, total), pid ) for pid, both in c.items() ]
     sorted_results = [(p,v) for p,v in sorted(results)]
     pvalues = [p for p,v in sorted_results]
@@ -118,6 +119,5 @@ if __name__ == '__main__' :
     pathway_ids = [p for _,p in sorted_results]
 
     gnames = set(g for g in genes if g in g2p)
-   
-    print_output( output_fn, gnames, pvalues, adj_pvalues, pathway_ids, pathways )
 
+    print_output( output_fn, gnames, pvalues, adj_pvalues, pathway_ids, pathways )
