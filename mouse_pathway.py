@@ -2,14 +2,20 @@ import sys
 from collections import Counter
 from statsmodels.stats.multitests import multipletests
 from scipy.stats import fisher_exact #, chi2_contingency
+from os.path import dirname, join
 
-id2sym = {}
+def get_id2sym( homology_fn = None ):
+    id2sym = {}
 
-for l in open( 'ensembl_homology.data'):
-    line = l.split('\t')
-    h, m = line[0].strip(), line[7].strip()
-    if h and m :
-        id2sym[h] = m
+    if not homology_fn  :
+        homology_fn = join( dirname( sys.argv[0], 'ensembl_homology.data') )
+
+    for l in homology_fn:
+        line = l.split('\t')
+        h, m = line[0].strip(), line[7].strip()
+        if h and m :
+            id2sym[h] = m
+    return id2sym
 
 def pathway2fisherp( nlist, npathway, nlistnpathway, ntotal, verbose=False ):
     if verbose :
@@ -95,12 +101,24 @@ def print_output( fn, gnames, pvalues, adj_pvalues, pathway_ids, pathways, cutof
 if __name__ == '__main__' :
     from os.path import dirname, join
     mouse_pathway_fn = join( dirname(sys.argv[0]), 'warpath.mouse.txt' )
+
     input_list = sys.argv[1]
     output_fn = sys.argv[2]
 
     g2p = build_gene2path( mouse_pathway_fn )
     pathways, genecounts = build_pathways(mouse_pathway_fn)
+    id2sym = get_id2sym()
+
+    #first try ID to symbol conversion
     genes = set([id2sym[g] for g in [ l.split(".")[0] for l in open(input_list) ] if g in id2sym ])
+    #if the conversion fails
+    #try them as symbols
+    if not genes :
+        symbols = set(list(id2sym.values()))
+        genes = set( [g in [ l.split(".")[0] for l in open(input_list) ] if g in symbols])
+
+    assert genes #test if the genes are empty or not.
+
     pathways_in = [g2p[g] for g in genes if g in g2p]
 
     c = Counter()
